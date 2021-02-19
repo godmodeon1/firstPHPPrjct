@@ -31,10 +31,14 @@ strong {
     font-size: 1.35em;
 }
 
-span {
+.date {
     background-color: #832B5B;
     color: #FEFFFC;
     padding: 2px 5px;
+}
+
+.content {
+    font-size: 1.3em;
 }
 
 .wrap {
@@ -70,4 +74,10 @@ span {
 
 .pageBtnPshd a {
     color: #FEFFFC;
+}
+
+.allnews {
+    font-size: 1.5em;
+    display: block;
+    margin-bottom: 1.5em;
 }

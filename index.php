@@ -23,46 +23,40 @@
 
         $page = $_GET["page"]; //Получаем номер страницы по клику
         $id = $_GET["id"]; //Получаем ID
+
+        //Формируем запрос:
+        $query = "SELECT * FROM `news` ORDER BY `idate`";
+        $queryArticle = "SELECT * FROM `news` WHERE id = $id";
+        
+        if (!$page and !$id) {
+            $page = 1;
+        }
+
         if ($page) {
 
             //Получаем диапазон статей для вывода
             $articleRangeEnd = $page * 5;
             $articleRangeStart = $articleRangeEnd - 4;
 
-            //Формируем запрос:
-            $query2 = "SELECT * FROM `news` ORDER BY `idate`";
-
             //Делаем запрос к БД, результат запроса пишем в $result:
-            $result2 = mysqli_query($link, $query2) or die(mysqli_error($link));
+            $result = mysqli_query($link, $query) or die(mysqli_error($link));
         
             //Проверяем что же нам отдала база данных, если null – то какие-то проблемы:
             //var_dump($result2);
     
             //Преобразуем то, что отдала нам база в нормальный массив PHP $data:
-            for ($data = []; $row = mysqli_fetch_assoc($result2); $data[] = $row);           
+            for ($data = []; $row = mysqli_fetch_assoc($result); $data[] = $row);           
                         
-                if ($result2 = mysqli_query($link, $query2)) {
-
-                        /* извлечение ассоциативного массива */
-                        $i = 0;
-                        while ($row = mysqli_fetch_assoc($result2)) {
-                            $i++;
-                            if ($i >= $articleRangeStart and $i <= $articleRangeEnd) {
-                                echo "<span class='date'>" . date("d.m.Y", $row["idate"]) . "</span>" . "\n <h3><a href='?id=" . $row["id"] . "'>" . $row["title"] . "</a></h3><br>" . $row["announce"] . "<br><br>";
-                            }
-                        }
-                        /* удаление выборки */
-                        mysqli_free_result($result2);
+            // извлечение ассоциативного массива
+            if ($result = mysqli_query($link, $query)) {
+                $i = 0;
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $i++;
+                    if ($i >= $articleRangeStart and $i <= $articleRangeEnd) {
+                        echo "<span class='date'>" . date("d.m.Y", $row["idate"]) . "</span>" . "\n <h3><a href='?id=" . $row["id"] . "'>" . $row["title"] . "</a></h3><br>" . $row["announce"] . "<br><br>";
                     }
-
-            //Формируем запрос всех статей из БД:
-            $query = "SELECT * FROM `news`";
-
-            //Делаем запрос к БД, результат запроса пишем в $result:
-            $result = mysqli_query($link, $query) or die(mysqli_error($link));
-
-            //Проверяем что же нам отдала база данных, если null – то какие-то проблемы:
-            //var_dump($result);
+                }
+            }
 
             $new = $result->num_rows; // Получем число записей в БД
             $numOfPages = ceil($new/5); // считаем количество страниц
@@ -81,9 +75,28 @@
                 // выводим кнопки
             echo $div . "<a href='index.php?page=". $i . "'>". $i . "</a></div>";
             }
+            /* удаление выборки */
+            mysqli_free_result($result);
         }
         if ($id) {
-            echo "AAAAAA";
+            //Делаем запрос к БД, результат запроса пишем в $result:
+            $result = mysqli_query($link, $queryArticle) or die(mysqli_error($link));
+
+            //Проверяем что же нам отдала база данных, если null – то какие-то проблемы:
+            //var_dump($result);
+    
+            //Преобразуем то, что отдала нам база в нормальный массив PHP $data:
+            for ($data = []; $row = mysqli_fetch_assoc($result); $data[] = $row);           
+
+            // извлечение ассоциативного массива
+            if ($result = mysqli_query($link, $queryArticle)) {
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo "<h1>" . $row['title'] . "</h1><hr>";
+                    echo "<span class='content'>" . $row['content'] . "</span>";
+                }
+            }
+            echo "<hr><a class='allnews' href='/firstPHPPrjct/index.php'>Все новости >></a>";
         }   
+
 ?>
 </div>
