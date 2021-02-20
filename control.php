@@ -27,8 +27,21 @@ function getParams() {
 getParams();
 
 //Формируем запрос:
-    $query = "SELECT * FROM `news` ORDER BY `idate`";
-    $queryArticle = "SELECT * FROM `news` WHERE id = $id";
+$query = "SELECT * FROM `news` ORDER BY `idate`";
+$queryArticle = "SELECT * FROM `news` WHERE id = $id";
+
+function requestSQL($request) {
+    global $result, $link, $data, $row, $query, $queryArticle;
+    //Делаем запрос к БД, результат запроса пишем в $result:
+    $result = mysqli_query($link, $request) or die(mysqli_error($link));
+
+    //Проверяем что же нам отдала база данных, если null – то какие-то проблемы:
+    //var_dump($result);
+
+    //Преобразуем то, что отдала нам база в нормальный массив PHP $data:
+    for ($data = []; $row = mysqli_fetch_assoc($result); $data[] = $row);           
+
+}
 
 function viewFirstPage() {
     global $page, $id;
@@ -43,6 +56,76 @@ function getArticleRange() {
     //Получаем диапазон статей для вывода
     $articleRangeEnd = $page * 5;
     $articleRangeStart = $articleRangeEnd - 4;
+}
+
+function countRowsSQL() {
+    global $new, $result, $num_rows, $numOfPages;
+    $new = $result->num_rows; // Получем число записей в БД
+    $numOfPages = ceil($new/5); // считаем количество страниц
+}
+
+function makeBtns() {
+    global $numOfPages, $page;
+    for ( $i = 1; $i <= $numOfPages; $i++ ) {
+        // Для окраски нажатой кнопки
+        if ($page == $i) {
+            $div = "<div class='pageBtn pageBtnPshd'>";
+        } else {
+            $div = "<div class='pageBtn'>";
+        }
+        // выводим кнопки
+    echo $div . "<a href='index.php?page=". $i . "'>". $i . "</a></div>";
+    }
+}
+
+function getDataFromArr($type) {
+    global $result, $link, $row, $query, $queryArticle, $articleRangeStart, $articleRangeEnd;                
+    
+    if ($type == "article") {$query = $queryArticle;}
+
+    // извлечение ассоциативного массива
+    if ($result = mysqli_query($link, $query)) {
+        $i = 0;
+        while ($row = mysqli_fetch_assoc($result)) {
+            $i++;
+            if ($type == "all") {
+                
+                if ($i >= $articleRangeStart and $i <= $articleRangeEnd) {
+                    echo "<span class='date'>" . date("d.m.Y", $row["idate"]) . "</span>" . "\n <h3><a href='?id=" . $row["id"] . "'>" . $row["title"] . "</a></h3><br>" . $row["announce"] . "<br><br>";
+                }       
+            }
+            if ($type == "article") {
+                buildPageHead();
+                echo "<span class='content'>" . $row['content'] . "</span>";
+            }
+
+        }
+    }
+
+}
+
+
+function buildPageHead() {
+    global $page, $row;
+    $title = 0;
+    if ($page) {$title = "Новости";} else {$title = $row['title'];};
+    echo "<!DOCTYPE html>
+    <html lang='en'>
+    <head>
+        <meta charset='UTF-8'>
+        <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+        <link rel='stylesheet' type='text/css' href='style.css' />
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <title>". $title ."</title>
+    </head>
+    <body>
+        <div class='wrap'>
+            <h1>" . $title . "</h1>
+            <hr>";
+}
+
+function buildPageFooter() {
+    echo "</div></body></html>";
 }
 
 ?>
