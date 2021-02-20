@@ -22,7 +22,6 @@ function getParams() {
     global $page, $id;
     $page = $_GET["page"]; //Получаем номер страницы по клику
     $id = $_GET["id"]; //Получаем ID
-
 }
 getParams();
 
@@ -65,6 +64,7 @@ function countRowsSQL() {
 }
 
 function makeBtns() {
+    echo "<hr><p><strong>Страницы:</strong></p>";
     global $numOfPages, $page;
     for ( $i = 1; $i <= $numOfPages; $i++ ) {
         // Для окраски нажатой кнопки
@@ -125,7 +125,12 @@ function buildPageHead() {
 }
 
 function buildPageFooter() {
+    global $page;
+    if (!$page) {
+    echo "<hr><a class='allnews' href='/firstPHPPrjct/index.php'>Все новости >></a>"; 
+    }
     echo "</div></body></html>";
+
 }
 
 ?>
