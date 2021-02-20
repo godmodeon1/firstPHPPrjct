@@ -3,40 +3,14 @@
 <div class="wrap">
 <h1>Новости</h1>
 <hr>
-<?php
-	//Устанавливаем доступы к базе данных:
-		$host = 'localhost'; //имя хоста, на локальном компьютере это localhost
-		$user = 'root'; //имя пользователя, по умолчанию это root
-		$password = 'root'; //пароль, по умолчанию пустой or root
-		$db_name = 'news'; //имя базы данных
-
-	//Соединяемся с базой данных используя наши доступы:
-		$link = mysqli_connect($host, $user, $password, $db_name);
+<?php 
+require_once('control.php');
 
 
-	/*
-		Соединение записывается в переменную $link,
-		которая используется дальше для работы mysqi_query.
-	*/
-	//Устанавливаем кодировку (не обязательно, но поможет избежать проблем):
-        mysqli_query($link, "SET NAMES 'utf8'");
 
-        $page = $_GET["page"]; //Получаем номер страницы по клику
-        $id = $_GET["id"]; //Получаем ID
-
-        //Формируем запрос:
-        $query = "SELECT * FROM `news` ORDER BY `idate`";
-        $queryArticle = "SELECT * FROM `news` WHERE id = $id";
-        
-        if (!$page and !$id) {
-            $page = 1;
-        }
 
         if ($page) {
-
-            //Получаем диапазон статей для вывода
-            $articleRangeEnd = $page * 5;
-            $articleRangeStart = $articleRangeEnd - 4;
+            getArticleRange();
 
             //Делаем запрос к БД, результат запроса пишем в $result:
             $result = mysqli_query($link, $query) or die(mysqli_error($link));
