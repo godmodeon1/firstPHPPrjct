@@ -22,6 +22,12 @@ function getParams() {
     global $page, $id;
     $page = $_GET["page"]; //Получаем номер страницы по клику
     $id = $_GET["id"]; //Получаем ID
+    if (!$page and !$id) {
+        $str = file_get_contents('php://input');
+        $freeParam = explode("=", $_SERVER["REQUEST_URI"]);
+        $id = $freeParam[1];
+    }
+
 }
 getParams();
 
@@ -91,7 +97,7 @@ function getDataFromArr($type) {
             if ($type == "all") {
                 
                 if ($i >= $articleRangeStart and $i <= $articleRangeEnd) {
-                    echo "<span class='date'>" . date("d.m.Y", $row["idate"]) . "</span>" . "\n <h3><a href='?id=" . $row["id"] . "'>" . $row["title"] . "</a></h3><br>" . $row["announce"] . "<br><br>";
+                    echo "<span class='date'>" . date('d.m.Y', $row['idate']) . "</span>" . "\n <h3><a href='/firstPHPPrjct/view.php?" . date('d.m.Yh:m', $row['idate']) . "=" . $row['id'] . "'>" . $row["title"] . "</a></h3><br>" . $row["announce"] . "<br><br>";
                 }       
             }
             if ($type == "article") {
@@ -129,6 +135,7 @@ function buildPageFooter() {
     if (!$page) {
     echo "<hr><a class='allnews' href='/firstPHPPrjct/index.php'>Все новости >></a>"; 
     }
+    
     echo "</div></body></html>";
 
 }
